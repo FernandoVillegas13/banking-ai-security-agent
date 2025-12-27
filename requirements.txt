@@ -1,0 +1,15 @@
+fastapi
+uvicorn[standard]
+pydantic
+pandas
+psycopg
+langgraph
+langgraph-checkpoint-postgres
+langchain_openai
+asyncpg
+sqlalchemy
+psycopg2-binary
+tabulate
+redis
+httpx
+jsonschema

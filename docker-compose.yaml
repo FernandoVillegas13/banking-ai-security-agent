@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  api:
+    build: .
+    container_name: deepfeeltest_api
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      REDIS_HOST: ${REDIS_HOST}
+      REDIS_PORT: ${REDIS_PORT}
+    # depends_on removed: no database
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+    networks:
+      - deepfeeltest_network
+    env_file:
+      - .env
+
+  redis:
+    image: redis:7-alpine
+    container_name: deepfeeltest_redis
+    ports:
+      - "${REDIS_PORT:-6380}:${REDIS_PORT:-6380}"
+    command: redis-server --port ${REDIS_PORT:-6380}
+    networks:
+      - deepfeeltest_network
+    restart: unless-stopped
+
+networks:
+  deepfeeltest_network:
+    driver: bridge
+
