@@ -1,0 +1,205 @@
+{
+  "transaction_data": {
+    "transaction_id": "T-1001",
+    "customer_id": "CU-001",
+    "amount": 1800.00,
+    "currency": "PEN",
+    "country": "PE",
+    "channel": "web",
+    "device_id": "D-01",
+    "timestamp": "2025-12-17T03:15:00",
+    "merchant_id": "M-001",
+    "hour_of_day": 3,
+    "day_of_week": "Tuesday"
+  },
+  
+  "customer_profile": {
+    "usual_amount_avg": 500.00,
+    "usual_amount_std": null,
+    "usual_hours_range": ["08:00", "20:00"],
+    "usual_countries": ["PE"],
+    "usual_devices": ["D-01"],
+    "historical_risk_score": 0.1
+  },
+  
+  "anomaly_signals": {
+    "amount_anomaly": {
+      "is_anomaly": true,
+      "score": 0.85,
+      "threshold": 3.0,
+      "ratio": 3.6,
+      "reason": "Amount > 3x usual average"
+    },
+    "time_anomaly": {
+      "is_anomaly": true,
+      "score": 0.92,
+      "outside_hours": true,
+      "hour_difference": 5,
+      "reason": "Transaction at 03:15 vs usual 08-20"
+    },
+    "device_anomaly": {
+      "is_anomaly": false,
+      "score": 0.05,
+      "device_match": true,
+      "reason": "Device D-01 is in usual devices"
+    },
+    "country_anomaly": {
+      "is_anomaly": false,
+      "score": 0.10,
+      "country_match": true,
+      "reason": "Country PE is in usual countries"
+    },
+    "channel_anomaly": {
+      "is_anomaly": false,
+      "score": 0.15,
+      "reason": "Web channel is common"
+    },
+    "composite_risk_score": 0.72
+  },
+  
+  "rag_evidence": [
+    {
+      "policy_id": "FP-01",
+      "rule_text": "Monto > 3x promedio habitual y horario fuera de rango → CHALLENGE",
+      "version": "2025.1",
+      "relevance_score": 0.95,
+      "matches": ["amount_anomaly", "time_anomaly"],
+      "applied_action": "CHALLENGE",
+      "retrieved_at": "2025-12-17T03:15:30Z",
+      "chunk_id": "policy_001_chunk_01"
+    },
+    {
+      "policy_id": "FP-02",
+      "rule_text": "Transacción internacional y dispositivo nuevo → ESCALATE_TO_HUMAN",
+      "version": "2025.1",
+      "relevance_score": 0.30,
+      "matches": [],
+      "applied_action": null,
+      "retrieved_at": "2025-12-17T03:15:32Z",
+      "chunk_id": "policy_001_chunk_02"
+    }
+  ],
+  
+  "external_intelligence": [
+    {
+      "source_type": "web_search",
+      "query": "fraud alerts merchant M-001 Peru 2025",
+      "url": "https://threat-intel.example.com/alerts/merchant-fraud-dec2025",
+      "title": "Recent Fraud Patterns in E-commerce Merchants - Peru",
+      "summary": "Alert about compromised merchant accounts in Peruvian e-commerce platforms",
+      "relevance_score": 0.65,
+      "threat_level": "medium",
+      "keywords": ["merchant_fraud", "e-commerce", "Peru"],
+      "retrieved_at": "2025-12-17T03:15:45Z"
+    },
+    {
+      "source_type": "threat_feed",
+      "query": "device D-01 fraud patterns",
+      "summary": "No known threats associated with device ID D-01",
+      "relevance_score": 0.10,
+      "threat_level": "low",
+      "retrieved_at": "2025-12-17T03:15:48Z"
+    }
+  ],
+  
+  "agent_decisions": {
+    "transaction_context_agent": {
+      "status": "completed",
+      "execution_time": "2025-12-17T03:15:10Z",
+      "anomalies_detected": ["amount", "time"],
+      "initial_risk_score": 0.72
+    },
+    "behavioral_pattern_agent": {
+      "status": "completed",
+      "execution_time": "2025-12-17T03:15:15Z",
+      "profile_match": true,
+      "behavioral_risk_score": 0.65,
+      "notes": "Customer has clean history but current transaction highly anomalous"
+    },
+    "internal_policy_rag_agent": {
+      "status": "completed",
+      "execution_time": "2025-12-17T03:15:35Z",
+      "policies_retrieved": 2,
+      "relevant_policies": 1,
+      "recommended_action": "CHALLENGE"
+    },
+    "external_threat_agent": {
+      "status": "completed",
+      "execution_time": "2025-12-17T03:15:50Z",
+      "sources_checked": 2,
+      "threats_found": 1,
+      "external_risk_score": 0.65,
+      "search_governance": {
+        "api_calls": 2,
+        "compliance_checked": true
+      }
+    },
+    "debate_agents": {
+      "status": "completed",
+      "execution_time": "2025-12-17T03:16:05Z",
+      "pro_fraud_arguments": [
+        {"argument": "Amount 3.6x usual average", "weight": 0.8},
+        {"argument": "Transaction at 3AM vs usual 8AM-8PM", "weight": 0.7},
+        {"argument": "External threat intelligence shows merchant risks", "weight": 0.6}
+      ],
+      "pro_customer_arguments": [
+        {"argument": "Device is known and trusted", "weight": 0.9},
+        {"argument": "Country matches usual patterns", "weight": 0.8},
+        {"argument": "Customer has clean history", "weight": 0.7}
+      ],
+      "debate_summary": "Strong evidence for fraud but some mitigating factors"
+    }
+  },
+  
+  "final_decision": {
+    "decision": "CHALLENGE",
+    "confidence": 0.68,
+    "decision_arbiter_agent": {
+      "status": "completed",
+      "execution_time": "2025-12-17T03:16:10Z",
+      "decision_factors": [
+        {"factor": "Policy FP-01 match", "weight": 0.4},
+        {"factor": "Time anomaly", "weight": 0.3},
+        {"factor": "Amount anomaly", "weight": 0.2},
+        {"factor": "External threat", "weight": 0.1}
+      ],
+      "alternative_decisions_considered": ["BLOCK", "APPROVE"],
+      "requires_human_review": false
+    },
+    "hitl_queue": {
+      "in_queue": false,
+      "queue_position": null,
+      "human_reviewer": null,
+      "review_timeout": null
+    }
+  },
+  
+  "explanations": {
+    "customer_explanation": "Esta transacción requiere validación adicional debido a un monto superior al habitual y realizarse en horario no común para usted. Le enviaremos un código de verificación a su dispositivo registrado.",
+    "audit_explanation": "Decisión: CHALLENGE. Señales: Monto 3.6x > promedio (1800 vs 500 PEN), horario 03:15 fuera de rango habitual (08-20). Política aplicada: FP-01. Evidencia externa: Alertas de fraude recientes en comercios similares. Ruta de agentes: Context → Behavior → RAG → Web → Debate → Decisión.",
+    "generated_at": "2025-12-17T03:16:15Z",
+    "explainability_agent": {
+      "status": "completed",
+      "execution_time": "2025-12-17T03:16:15Z"
+    }
+  },
+  
+  "metadata": {
+    "workflow_start_time": "2025-12-17T03:15:00Z",
+    "workflow_end_time": "2025-12-17T03:16:20Z",
+    "total_processing_time_ms": 80000,
+    "agents_executed": [
+      "transaction_context_agent",
+      "behavioral_pattern_agent", 
+      "internal_policy_rag_agent",
+      "external_threat_agent",
+      "evidence_aggregation_agent",
+      "pro_fraud_agent",
+      "pro_customer_agent",
+      "decision_arbiter_agent",
+      "explainability_agent"
+    ],
+    "system_version": "1.0.0",
+    "trace_id": "fraud-detection-trace-001"
+  }
+}
